@@ -1,24 +1,19 @@
 # 🍸 DrinkTi — 调一杯属于你的人格
 
-[![Java](https://img.shields.io/badge/Java-8%2B-orange)](https://www.java.com)
-[![MySQL](https://img.shields.io/badge/MySQL-5.7%2B-blue)](https://www.mysql.com)
-[![Tomcat](https://img.shields.io/badge/Tomcat-9-yellowgreen)](https://tomcat.apache.org)
 
-> 基于 MBTI 心理学的饮料人格测试系统 —— 24 道生活场景题，把你映射到 16 种饮料人格，还能和朋友合调专属鸡尾酒。
+
+> 基于 MBTI 心理学的饮料人格测试系统 —— 24 道生活场景题，把你映射到 16 种饮料人格，还能和朋友调制专属鸡尾酒。
 
 ---
 
 ## ✨ 截图预览
 
-| 首页 | 饮品柜 |
-|:---:|:---:|
-| ![Hero](docs/images/A_elegant_cocktail_glass_with__2026-06-02T12-39-36.png) | ![Cabinet](docs/images/Abstract_MBTI_personality_type_2026-06-02T12-39-48.png) |
+<img width="1415" height="831" alt="image" src="https://github.com/user-attachments/assets/38fa8ca6-fb0c-4f2f-821e-d0239997025e" />
 
-| 双人特调 |
-|:---:|
-| ![Cocktail](docs/images/Two_cocktail_glasses_merging_t_2026-06-02T12-39-40.png) |
+<img width="1297" height="668" alt="image" src="https://github.com/user-attachments/assets/d09d38bb-5177-49e0-b426-d223a04788ab" />
+<img width="1396" height="830" alt="image" src="https://github.com/user-attachments/assets/107e7423-57be-49fa-91b4-310e1385bd1c" />
 
----
+
 
 ## 🎯 功能一览
 
