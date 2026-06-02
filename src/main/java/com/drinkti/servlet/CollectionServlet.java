@@ -29,8 +29,8 @@ public class CollectionServlet extends BaseServlet {
                 collection = dao.getCollectionSummaryByUser(userId);
                 cocktailCount = cocktailDao.countByUserIdOrPartner(userId);
             } else {
-                collection = dao.getCollectionSummary();
-                cocktailCount = cocktailDao.countAll();
+                collection = new HashMap<>();
+                cocktailCount = 0;
             }
 
             Map<String, Object> result = new HashMap<>();

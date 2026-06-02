@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +99,7 @@ public class CocktailServlet extends BaseServlet {
                 // 查询：我是发起者 OR 我是 partner
                 cocktails = dao.findByUserIdOrPartner(userId);
             } else {
-                cocktails = dao.findAll();
+                cocktails = Collections.emptyList();
             }
             resp.getWriter().write(GSON.toJson(cocktails));
         } catch (SQLException e) {
