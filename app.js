@@ -257,7 +257,7 @@ async function renderResult() {
   }
   const { mbti, drink, pct, no } = result;
   const displayPct = pct || computePctFromScores(result.scores);
-  const code = generateCode(mbti);
+  const code = generateCode(mbti, no);
 
   wrap.innerHTML = `
     <div class="result-card">
@@ -341,16 +341,17 @@ const DRINK_CODE = {
 };
 
 /**
- * 生成人格码：如 WHS-INTJ
+ * 生成人格码：如 WHS-INTJ-4821 (饮料短码-MBTI-编号)
  */
-function generateCode(mbti) {
+function generateCode(mbti, no) {
   const prefix = DRINK_CODE[mbti] || "UNK";
-  return `${prefix}-${mbti}`;
+  const num = no || "0000";
+  return `${prefix}-${mbti}-${num}`;
 }
 
 /**
- * 解析人格码：提取 MBTI 类型
- * 支持格式: WHS-INTJ / INTJ / drk-intj-x3f 等
+ * 解析人格码：提取 MBTI 类型和编号
+ * 支持格式: WHS-INTJ-4821 / WHS-INTJ / drk-intj-x3f 等
  */
 function parseCode(codeStr) {
   if (!codeStr || typeof codeStr !== "string") return null;
@@ -360,9 +361,15 @@ function parseCode(codeStr) {
   const m = code.match(re);
   if (!m) return null;
   const mbti = m[0];
+  // 提取编号（MBTI后面的4位数字）
+  const noMatch = code.match(new RegExp(mbti + "-(\\d{4})"));
   // 提取可能的用户 ID
   const uidMatch = code.match(/UID(\d+)/i);
-  return { mbti, userId: uidMatch ? parseInt(uidMatch[1]) : null };
+  return {
+    mbti,
+    no: noMatch ? noMatch[1] : null,
+    userId: uidMatch ? parseInt(uidMatch[1]) : null,
+  };
 }
 
 function copyToClipboard(text) {
@@ -872,7 +879,7 @@ function renderAuthSection() {
  */
 function renderPersonalityDetail(result) {
   const { mbti, drink, scores, no } = result;
-  const code = generateCode(mbti);
+  const code = generateCode(mbti, no);
   const displayPct = result.pct || computePctFromScores(scores);
 
   $("#personalityDetail").innerHTML = `
