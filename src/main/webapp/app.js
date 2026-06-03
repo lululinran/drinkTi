@@ -332,6 +332,39 @@ function dimBarHtml(leftLabel, rightLabel, leftPct) {
     </div>`;
 }
 
+// MBTI → 饮料短码映射
+const DRINK_CODE = {
+  "ENFJ": "RSE", "ENFP": "PCH", "ENTJ": "BLK", "ENTP": "MJT",
+  "ESFJ": "MLD", "ESFP": "SPK", "ESTJ": "AMC", "ESTP": "TQL",
+  "INFJ": "COC", "INFP": "MCH", "INTJ": "WHS", "INTP": "GNT",
+  "ISFJ": "SOY", "ISFP": "CNT", "ISTJ": "WTR", "ISTP": "SOD",
+};
+
+/**
+ * 生成人格码：如 WHS-INTJ
+ */
+function generateCode(mbti) {
+  const prefix = DRINK_CODE[mbti] || "UNK";
+  return `${prefix}-${mbti}`;
+}
+
+/**
+ * 解析人格码：提取 MBTI 类型
+ * 支持格式: WHS-INTJ / INTJ / drk-intj-x3f 等
+ */
+function parseCode(codeStr) {
+  if (!codeStr || typeof codeStr !== "string") return null;
+  const code = codeStr.trim().toUpperCase();
+  // 匹配 E/I + S/N + T/F + J/P 的四字母组合
+  const re = /([EI])([SN])([TF])([JP])/;
+  const m = code.match(re);
+  if (!m) return null;
+  const mbti = m[0];
+  // 提取可能的用户 ID
+  const uidMatch = code.match(/UID(\d+)/i);
+  return { mbti, userId: uidMatch ? parseInt(uidMatch[1]) : null };
+}
+
 function copyToClipboard(text) {
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).catch(() => {});
