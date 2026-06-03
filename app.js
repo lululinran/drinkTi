@@ -455,20 +455,33 @@ function showCocktailDetailModal(detail) {
   const partnerName = (detail.partner && (detail.partner.nickname || detail.partner.username))
     || (detail.partnerUserId ? `用户#${detail.partnerUserId}` : `${detail.typeB} · ${dB ? dB.name : (detail.drinkNameB || "未知")}`);
 
+  // 生成混合特调 SVG
+  const mixColor = mixHex(dA.color, dB.color);
+  const cocktailSvg = `
+    <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 40 50 L 100 145 L 160 50 Z" fill="none" stroke="#3D2A1F" stroke-width="2.5" stroke-linejoin="round"/>
+      <line x1="100" y1="145" x2="100" y2="205" stroke="#3D2A1F" stroke-width="2.5"/>
+      <line x1="65" y1="225" x2="135" y2="225" stroke="#3D2A1F" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="100" y1="205" x2="100" y2="225" stroke="#3D2A1F" stroke-width="2.5"/>
+      <clipPath id="cdCtkClip"><path d="M 42 52 L 100 143 L 158 52 Z"/></clipPath>
+      <g clip-path="url(#cdCtkClip)">
+        <rect x="35" y="50" width="130" height="50" fill="${dA.color}" opacity="0.95"/>
+        <rect x="35" y="100" width="130" height="50" fill="${dB.color}" opacity="0.95"/>
+        <rect x="35" y="85" width="130" height="20" fill="${mixColor}" opacity="0.6"/>
+      </g>
+      <circle cx="130" cy="55" r="5" fill="#C44E3A"/>
+      <line x1="130" y1="55" x2="155" y2="35" stroke="#5A7F3C" stroke-width="2"/>
+    </svg>`;
+
   const overlay = document.createElement("div");
   overlay.className = "cd-modal-overlay";
   overlay.innerHTML = `
     <div class="cd-modal" onclick="event.stopPropagation()">
       <button class="cd-modal-close" id="cdClose">×</button>
 
-      <!-- 顶部视觉：两杯酒 -->
-      <div class="cd-visual">
-        <div class="cd-drink-big">${renderDrinkSVG(detail.typeA)}</div>
-        <div class="cd-mix-symbol">
-          <span class="cd-plus-big">+</span>
-          <span class="cd-eq">=</span>
-        </div>
-        <div class="cd-drink-big">${renderDrinkSVG(detail.typeB)}</div>
+      <!-- 顶部视觉：混合特调 -->
+      <div class="cd-visual cd-visual-mix">
+        <div class="cd-cocktail-glass">${cocktailSvg}</div>
       </div>
 
       <!-- 特调名称 -->
