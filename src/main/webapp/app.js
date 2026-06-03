@@ -31,8 +31,15 @@ async function navigateTo(view) {
   }
 
   // 进入个人页面前刷新用户状态
-  if (view === "profile") {
+  if (view === "profile" || view === "test" || view === "cabinet" || view === "cocktail") {
     await DataAPI.getCurrentUser();
+  }
+
+  // 答题前强制登录
+  if (view === "test" && !_currentUser) {
+    toast("请先登录或注册，才能开始测试");
+    navigateTo("profile");
+    return;
   }
 
   $$(".view").forEach((v) => v.classList.toggle("active", v.dataset.view === view));
@@ -215,13 +222,6 @@ function prevQuestion() {
 }
 
 async function finishTest() {
-  // 检查是否登录
-  await DataAPI.getCurrentUser();
-  if (!_currentUser) {
-    toast("请先在「我的」页面注册或登录，才能保存测试结果");
-    return;
-  }
-
   const { mbti, scores, pct } = calculateMBTI(State.answers);
   const result = {
     mbti,
