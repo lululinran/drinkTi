@@ -102,32 +102,226 @@ function calculateMBTI(answers) {
 }
 
 // ============================================================
-// 双人特调生成（纯前端）
+// 双人特调生成（纯前端）— 256对各有独有名称
 // ============================================================
+
+// 名称模式池（按差异度分组）
+const NAME_PATTERNS = {
+  same: [
+    ["双倍{nameA}", "Double {enA}"],
+    ["纯{nameA}", "Pure {enA}"],
+    ["镜像{nameA}", "Mirror {enA}"],
+    ["{nameA}²", "{enA} Squared"],
+    ["双重{nameB}", "Twin {enB}"],
+    ["{enA} on the Rocks", "{nameB}加冰"],
+    ["经典{nameA}", "Classic {enA}"],
+    ["深烘{enA}", "Dark Roast {enA}"],
+    ["{enA} Neat", "{nameA}纯饮"],
+    ["无糖{nameA}", "Unsweetened {enA}"],
+    ["{enA} Essence", "{nameA}原味"],
+    ["独享{nameA}", "Solo {enA}"],
+    ["{enA} Reserve", "{nameA}典藏"],
+    ["慢品{nameB}", "Slow Pour {enB}"],
+    ["{enA} Spirit", "{nameB}灵魂"],
+    ["至醇{nameA}", "Quintessence of {enA}"],
+  ],
+  diff1: [
+    ["{enA} × {enB}", "{nameB}{nameA}特调"],
+    ["微醺{enA}{enB}", "Tipsy {enA} & {enB}"],
+    ["{nameB}遇见{nameA}", "{enA} Meets {enB}"],
+    ["{enA} Fizz", "{nameA}气泡"],
+    ["{enA} Smash", "{nameA}碎冰"],
+    ["{enB} Sour", "{nameB}酸调"],
+    ["{nameA}冰茶", "{enA} Iced Tea"],
+    ["{enB} Breeze", "{nameB}微风"],
+    ["蜜桃{enA}", "Peach {enA}"],
+    ["{enA} Lemonade", "{nameA}柠檬水"],
+    ["{enB} Ginger", "{nameB}姜汁"],
+    ["{nameA}日出", "{enA} Sunrise"],
+    ["{enB} Tonic", "{nameB}汤力"],
+    ["{nameA}午后", "{enA} Afternoon"],
+    ["{enB} Spritz", "{nameB}气泡酒"],
+    ["{nameA}薄暮", "{enA} Twilight"],
+    ["{enA} Collins", "{nameA}科林斯"],
+    ["{enB} Cooler", "{nameB}酷乐"],
+    ["{nameA}清风", "{enA} Gentle Breeze"],
+    ["{enB} Mint", "{nameB}薄荷"],
+    ["{nameA}日落", "{enA} Sunset"],
+    ["{enB} Berry", "{nameB}莓果"],
+    ["{nameA}雨林", "{enA} Rainforest"],
+    ["{enB} Daisy", "{nameB}雏菊"],
+    ["{nameA}晚霞", "{enA} Afterglow"],
+    ["{enB} Velvet", "{nameB}丝绒"],
+    ["{nameA}烟熏", "{enA} Smoked"],
+    ["{enB} Bloom", "{nameB}花开"],
+    ["{nameA}琥珀", "{enA} Amber"],
+    ["{enB} Sparkle", "{nameB}闪亮"],
+    ["{nameA}焦糖", "{enA} Caramel"],
+    ["{enB} Mist", "{nameB}薄雾"],
+  ],
+  diff2: [
+    ["霓虹{enA}", "Neon {enA}"],
+    ["{enB}特调", "{enB} Special"],
+    ["{nameA}与{nameB}", "{enA} & {enB}"],
+    ["{enB}风味{enA}", "{enB}-infused {enA}"],
+    ["{nameB}撞{nameA}", "{enB} vs {enA}"],
+    ["午夜{enA}", "Midnight {enA}"],
+    ["{enB}雪顶", "{enB} Affogato"],
+    ["{nameA}之恋", "Love of {enA}"],
+    ["{enB}玫瑰", "{enB} Rose"],
+    ["{nameA}晨曦", "{enA} Dawn"],
+    ["{enB}凉茶", "{enB} Cool Tea"],
+    ["{nameA}情书", "{enA} Love Letter"],
+    ["{enB}摩卡", "{enB} Mocha"],
+    ["{nameA}协奏曲", "{enA} Concerto"],
+    ["{enB}乌龙", "{enB} Oolong"],
+    ["{nameA}变奏", "{enA} Variation"],
+    ["{enB}奶盖", "{enB} Cream Top"],
+    ["{nameA}苏打", "{enA} Soda"],
+    ["{enB}晨光", "{enB} Morning Light"],
+    ["{nameA}蜜语", "{enA} Honey Talk"],
+    ["风中的{nameB}", "{enB} in the Wind"],
+    ["{nameA}森林", "{enA} Forest"],
+    ["盐系{enB}", "Salty {enB}"],
+    ["{nameA}星夜", "{enA} Starry Night"],
+    ["海盐{enB}", "Sea Salt {enB}"],
+    ["{nameA}花园", "{enA} Garden"],
+    ["椰林{enB}", "Coconut {enB}"],
+    ["{nameA}浮云", "{enA} Cloud"],
+    ["迷迭{enB}", "Rosemary {enB}"],
+    ["{nameA}银河", "{enA} Galaxy"],
+    ["甘露{enB}", "Nectar {enB}"],
+    ["{nameA}极光", "{enA} Aurora"],
+    ["{enB} Crush", "{nameB}碰撞"],
+    ["{nameA}吟游", "{enA} Bard"],
+    ["{enB} Dream", "{nameB}梦境"],
+    ["{nameA}绯月", "{enA} Crimson Moon"],
+    ["{enB} Echo", "{nameB}回响"],
+    ["{nameA}雾凇", "{enA} Frost"],
+    ["{enB} Whispers", "{nameB}低语"],
+    ["{nameA}糖霜", "{enA} Frosting"],
+    ["{enB} Mirage", "{nameB}幻象"],
+    ["{nameA}落日", "{enA} Sundown"],
+    ["{enB} Tempest", "{nameB}风暴"],
+    ["{nameA}涟漪", "{enA} Ripple"],
+    ["{enB} Horizon", "{nameB}地平线"],
+    ["{nameA}余烬", "{enA} Ember"],
+    ["{enB} Eclipse", "{nameB}日蚀"],
+    ["{nameA}霜降", "{enA} Frostfall"],
+  ],
+  diff3: [
+    ["深夜{enB}", "Late Night {enB}"],
+    ["{enA}电台", "{enA} Radio"],
+    ["{nameB}暴击", "{enB} Strike"],
+    ["薄荷{enA}", "Mint {enA}"],
+    ["{nameB}月夜", "{enB} Moonlit"],
+    ["{enA}奶昔", "{enA} Shake"],
+    ["冰火{enB}", "Fire & Ice {enB}"],
+    ["{nameA}烈焰", "{enA} Flame"],
+    ["{enB}极光", "{enB} Aurora"],
+    ["{nameA}飓风", "{enA} Hurricane"],
+    ["闪电{enB}", "Lightning {enB}"],
+    ["{nameA}熔岩", "{enA} Lava"],
+    ["雷暴{enB}", "Thunder {enB}"],
+    ["{nameA}寒霜", "{enA} Frostbite"],
+    ["火山{enB}", "Volcano {enB}"],
+    ["{nameA}潮汐", "{enA} Tide"],
+    ["{enB} Tornado", "{nameB}龙卷"],
+    ["{nameA}地震", "{enA} Quake"],
+    ["{enB} Blizzard", "{nameB}暴雪"],
+    ["{nameA}海啸", "{enA} Tsunami"],
+    ["{enB} Cyclone", "{nameB}旋风"],
+    ["{nameA}岩浆", "{enA} Magma"],
+    ["{enB} Thunderbolt", "{nameB}霹雳"],
+    ["{nameA}沙暴", "{enA} Sandstorm"],
+    ["{enB} Avalanche", "{nameB}雪崩"],
+    ["{nameA}流星", "{enA} Meteor"],
+    ["{enB} Inferno", "{nameB}炼狱"],
+    ["{nameA}冰川", "{enA} Glacier"],
+    ["{enB} Typhoon", "{nameB}台风"],
+    ["{nameA}彗星", "{enA} Comet"],
+    ["{enB} Vortex", "{nameB}漩涡"],
+    ["{nameA}极寒", "{enA} Subzero"],
+  ],
+  opposite: [
+    ["极地烈焰", "Polar Flame"],
+    ["无糖搭子", "Sugar-free Pair"],
+    ["冰与火之歌", "Song of Ice & Fire"],
+    ["{enA} vs {enB}", "{nameA}对{nameB}"],
+    ["昼夜交替", "Day & Night"],
+    ["两极", "Two Poles"],
+    ["{enA} Paradox", "{nameA}悖论"],
+    ["阴阳特调", "Yin Yang Mix"],
+    ["{enA} Collision", "{nameA}碰撞"],
+    ["对立统一", "Unity of Opposites"],
+    ["{enA} Duality", "{nameA}二元"],
+    ["正反合", "Thesis Antithesis"],
+    ["{enA} Contrast", "{nameA}反差"],
+    ["南北极", "North & South"],
+    ["{enA} Fusion", "{nameA}融合"],
+    ["矛盾螺旋", "Spiral of Contradiction"],
+  ],
+};
+
+// 格式化名称中的占位符（自动去"型"后缀）
+function formatName(pattern, a, b) {
+  const na = (a.name || "").replace(/型$/, "").replace(/品$/, "");
+  const nb = (b.name || "").replace(/型$/, "").replace(/品$/, "");
+  return pattern
+    .replace(/\{nameA\}/g, na)
+    .replace(/\{nameB\}/g, nb)
+    .replace(/\{enA\}/g, a.en)
+    .replace(/\{enB\}/g, b.en);
+}
+
+// 根据差异度和哈希值选取名称（中文 + 英文）
+function pickName(diff, hash) {
+  const pool = NAME_PATTERNS[diff] || NAME_PATTERNS["diff3"];
+  return pool[hash % pool.length];
+}
+
 function generateCocktail(typeA, typeB) {
   const key = `${typeA}+${typeB}`;
-  if (SPECIAL_PAIRS[key]) {
-    const c = SPECIAL_PAIRS[key];
-    return { ...c, compatibility: 88, typeA, typeB, drinkA: DRINKS[typeA], drinkB: DRINKS[typeB] };
-  }
+  const drinkA = DRINKS[typeA];
+  const drinkB = DRINKS[typeB];
+  const hash = hashStr(key) >>> 0;
   const diff = countDimDiff(typeA, typeB);
+  let diffKey = diff === 0 ? "same" : diff === 1 ? "diff1" : diff === 2 ? "diff2" : diff === 3 ? "diff3" : "opposite";
+
+  // 特殊配对（有自定义笔记的）
+  const special = SPECIAL_PAIRS[key] || null;
+
+  // 选取模板（用于 notes）
   let pool, baseCompat;
   if (diff === 0)      { pool = (COCKTAIL_TEMPLATES && COCKTAIL_TEMPLATES.same)     || []; baseCompat = 96; }
   else if (diff === 1) { pool = (COCKTAIL_TEMPLATES && COCKTAIL_TEMPLATES.diff1)    || []; baseCompat = 86; }
   else if (diff === 2) { pool = (COCKTAIL_TEMPLATES && COCKTAIL_TEMPLATES.diff2)    || []; baseCompat = 75; }
   else if (diff === 3) { pool = (COCKTAIL_TEMPLATES && COCKTAIL_TEMPLATES.diff3)    || []; baseCompat = 62; }
   else                  { pool = (COCKTAIL_TEMPLATES && COCKTAIL_TEMPLATES.opposite) || []; baseCompat = 50; }
-  if (!pool || pool.length === 0) {
-    return { name: "特调", subtitle: "Mix", notes: "", compatibility: 50, typeA, typeB, drinkA: DRINKS[typeA], drinkB: DRINKS[typeB] };
+  const tpl = (pool && pool.length > 0) ? pool[hash % pool.length] : null;
+
+  // 生成独有名称（特殊配对用精选名称）
+  let cnName, enName;
+  if (special) {
+    cnName = special.name;
+    enName = special.subtitle;
+  } else {
+    const namePair = pickName(diffKey, hash);
+    cnName = formatName(namePair[0], drinkA, drinkB);
+    enName = formatName(namePair[1], drinkA, drinkB);
   }
-  const hash = hashStr(typeA + typeB) >>> 0;
-  const tpl = pool[hash % pool.length];
+
   const jitter = (hash % 7) - 3;
+  const compat = Math.max(20, Math.min(99, baseCompat + jitter));
+  const notes = special ? special.notes : (tpl ? tpl.notes : "");
+
   return {
-    ...tpl,
-    compatibility: Math.max(20, Math.min(99, baseCompat + jitter)),
+    name: cnName,
+    subtitle: enName,
+    notes,
+    compatibility: compat,
     typeA, typeB,
-    drinkA: DRINKS[typeA], drinkB: DRINKS[typeB],
+    drinkA, drinkB,
   };
 }
 
