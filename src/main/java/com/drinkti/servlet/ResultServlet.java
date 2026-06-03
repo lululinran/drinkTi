@@ -29,9 +29,15 @@ public class ResultServlet extends BaseServlet {
                 userId = (Long) session.getAttribute("userId");
             }
 
+            // 未登录不返回任何数据
+            if (userId == null) {
+                resp.getWriter().write("null");
+                return;
+            }
+
             // ?latest=true 只返回最近一条结果
             if ("true".equals(req.getParameter("latest"))) {
-                List<TestResult> all = (userId != null) ? dao.findByUserId(userId) : dao.findAll();
+                List<TestResult> all = dao.findByUserId(userId);
                 if (!all.isEmpty()) {
                     resp.getWriter().write(GSON.toJson(all.get(0)));
                 } else {
@@ -40,12 +46,7 @@ public class ResultServlet extends BaseServlet {
                 return;
             }
 
-            List<TestResult> results;
-            if (userId != null) {
-                results = dao.findByUserId(userId);
-            } else {
-                results = dao.findAll();
-            }
+            List<TestResult> results = dao.findByUserId(userId);
             resp.getWriter().write(GSON.toJson(results));
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
