@@ -106,6 +106,7 @@ public class AuthServlet extends BaseServlet {
             HttpSession session = req.getSession(true);
             session.setAttribute("userId", user.getId());
             session.setAttribute("username", user.getUsername());
+            session.setAttribute("role", user.getRole());
 
             Map<String, Object> result = new HashMap<>();
             result.put("success", true);
@@ -149,6 +150,7 @@ public class AuthServlet extends BaseServlet {
             HttpSession session = req.getSession(true);
             session.setAttribute("userId", user.getId());
             session.setAttribute("username", user.getUsername());
+            session.setAttribute("role", user.getRole());
 
             Map<String, Object> result = new HashMap<>();
             result.put("success", true);
@@ -213,6 +215,7 @@ public class AuthServlet extends BaseServlet {
         map.put("username", user.getUsername());
         map.put("nickname", user.getNickname());
         map.put("avatar", user.getAvatar());
+        map.put("role", user.getRole());
         return map;
     }
 

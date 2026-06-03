@@ -84,6 +84,7 @@
           <button class="btn btn-ghost" data-nav="cabinet">看看饮品柜</button>
         </div>
         <div class="hero-foot">
+          <span class="dot-mark">⌁</span> 注册登录后数据云端保存 · 一杯 5 分钟
         </div>
       </div>
 
@@ -217,6 +218,7 @@
       <div class="features-head">
         <div class="features-mark">— FEATURES · 04 ITEMS —</div>
         <h2 class="section-title">为什么这是一杯<em>属于你的</em>人格</h2>
+        <p class="section-sub">从题库设计、视觉系统到双人玩法,每一处都不是流水线产物。</p>
       </div>
       <div class="feature-grid">
         <article class="feat-card">
@@ -318,7 +320,7 @@
     <div class="cocktail-wrap">
       <header class="cocktail-head">
         <h1 class="page-title">双人特调</h1>
-        <p class="page-sub">把朋友的人格码贴进来,调制一杯属于你们的鸡尾酒。</p>
+        <p class="page-sub">把朋友的人格码贴进来,我帮你们调一杯专属鸡尾酒。</p>
       </header>
 
       <div class="mix-panel">
@@ -336,7 +338,8 @@
         <div class="mix-side mix-friend">
           <div class="mix-label">朋友的人格码</div>
           <div class="mix-input-box">
-            <input id="friendCode" type="text" class="mix-input" placeholder="粘贴人格码"/>
+            <input id="friendCode" type="text" class="mix-input" placeholder="贴一段类似 DRK-INTJ-X3F 的代码"/>
+            <p class="mix-hint">让朋友先测一次,在结果页复制 ta 的人格码发给你。</p>
           </div>
           <div id="friendDrinkBox" class="mix-drink-box hidden">
             <!-- 解码后显示朋友的饮料 -->
@@ -362,6 +365,7 @@
     <div class="profile-wrap">
       <header class="profile-head">
         <h1 class="page-title">我的</h1>
+        <p class="page-sub">注册登录后数据云端存储,安全可靠。</p>
       </header>
 
       <!-- 登录/注册区 -->
@@ -385,8 +389,66 @@
       </div>
 
       <footer class="page-foot">
-        DrinkTi<br/>
+        DrinkTi · 课程作业演示版本 · 数据保存在云端 MySQL 数据库<br/>
+        <span class="dim">技术架构:Java Servlet + MySQL + HTML/CSS/JavaScript</span>
       </footer>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       视图 7:管理后台（仅管理员可见）
+       ============================================================ -->
+  <section class="view view-admin" data-view="admin">
+    <div class="admin-container">
+      <div class="admin-header">
+        <h1 class="admin-title">⚙️ 管理后台</h1>
+        <p class="admin-subtitle">DrinkTi · 系统数据中心</p>
+      </div>
+      <!-- 统计卡片 -->
+      <div class="admin-stats" id="adminStats">
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" id="statUserCount">-</div>
+          <div class="admin-stat-label">注册用户</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" id="statResultCount">-</div>
+          <div class="admin-stat-label">测试记录</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" id="statCocktailCount">-</div>
+          <div class="admin-stat-label">特调记录</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" id="statTemplateCount">-</div>
+          <div class="admin-stat-label">风味模板</div>
+        </div>
+      </div>
+      <!-- Tab 切换 -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-atab="users">👤 用户列表</button>
+        <button class="admin-tab" data-atab="mbti">🧬 MBTI 分布</button>
+        <button class="admin-tab" data-atab="results">📋 测试记录</button>
+        <button class="admin-tab" data-atab="cocktails">🍹 特调记录</button>
+      </div>
+      <!-- 面板内容 -->
+      <div class="admin-panels">
+        <div class="admin-panel active" id="apanel-users">
+          <table class="admin-table" id="atable-users"><thead><tr><th>ID</th><th>用户名</th><th>昵称</th><th>角色</th><th>测试次数</th><th>最近MBTI</th><th>注册时间</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div class="admin-panel" id="apanel-mbti">
+          <div id="mbtiDistGrid" class="mbti-dist-grid"></div>
+        </div>
+        <div class="admin-panel" id="apanel-results">
+          <table class="admin-table" id="atable-results"><thead><tr><th>ID</th><th>用户</th><th>MBTI</th><th>饮品</th><th>编号</th><th>测试日期</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div class="admin-panel" id="apanel-cocktails">
+          <table class="admin-table" id="atable-cocktails"><thead><tr><th>ID</th><th>发起者</th><th>搭档</th><th>类型A</th><th>类型B</th><th>特调名</th><th>匹配度</th><th>时间</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+      <div class="admin-actions">
+        <button class="btn btn-ghost" id="btnAdminRefresh">刷新数据</button>
+        <button class="btn btn-ghost" data-nav="home">返回首页</button>
+      </div>
     </div>
   </section>
 

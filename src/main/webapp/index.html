@@ -395,6 +395,63 @@
     </div>
   </section>
 
+  <!-- ============================================================
+       视图 7:管理后台（仅管理员可见）
+       ============================================================ -->
+  <section class="view view-admin" data-view="admin">
+    <div class="admin-container">
+      <div class="admin-header">
+        <h1 class="admin-title">⚙️ 管理后台</h1>
+        <p class="admin-subtitle">DrinkTi · 系统数据中心</p>
+      </div>
+      <!-- 统计卡片 -->
+      <div class="admin-stats" id="adminStats">
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" id="statUserCount">-</div>
+          <div class="admin-stat-label">注册用户</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" id="statResultCount">-</div>
+          <div class="admin-stat-label">测试记录</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" id="statCocktailCount">-</div>
+          <div class="admin-stat-label">特调记录</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num" id="statTemplateCount">-</div>
+          <div class="admin-stat-label">风味模板</div>
+        </div>
+      </div>
+      <!-- Tab 切换 -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-atab="users">👤 用户列表</button>
+        <button class="admin-tab" data-atab="mbti">🧬 MBTI 分布</button>
+        <button class="admin-tab" data-atab="results">📋 测试记录</button>
+        <button class="admin-tab" data-atab="cocktails">🍹 特调记录</button>
+      </div>
+      <!-- 面板内容 -->
+      <div class="admin-panels">
+        <div class="admin-panel active" id="apanel-users">
+          <table class="admin-table" id="atable-users"><thead><tr><th>ID</th><th>用户名</th><th>昵称</th><th>角色</th><th>测试次数</th><th>最近MBTI</th><th>注册时间</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div class="admin-panel" id="apanel-mbti">
+          <div id="mbtiDistGrid" class="mbti-dist-grid"></div>
+        </div>
+        <div class="admin-panel" id="apanel-results">
+          <table class="admin-table" id="atable-results"><thead><tr><th>ID</th><th>用户</th><th>MBTI</th><th>饮品</th><th>编号</th><th>测试日期</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div class="admin-panel" id="apanel-cocktails">
+          <table class="admin-table" id="atable-cocktails"><thead><tr><th>ID</th><th>发起者</th><th>搭档</th><th>类型A</th><th>类型B</th><th>特调名</th><th>匹配度</th><th>时间</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+      <div class="admin-actions">
+        <button class="btn btn-ghost" id="btnAdminRefresh">刷新数据</button>
+        <button class="btn btn-ghost" data-nav="home">返回首页</button>
+      </div>
+    </div>
+  </section>
+
   <!-- Toast 提示 -->
   <div id="toast" class="toast"></div>
 

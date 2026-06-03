@@ -281,7 +281,9 @@ function pickName(diff, hash) {
 }
 
 function generateCocktail(typeA, typeB) {
-  const key = `${typeA}+${typeB}`;
+  // 排序保证 A+B 和 B+A 产生相同结果
+  const sorted = [typeA, typeB].sort();
+  const key = `${sorted[0]}+${sorted[1]}`;
   const drinkA = DRINKS[typeA];
   const drinkB = DRINKS[typeB];
   const hash = hashStr(key) >>> 0;
@@ -414,6 +416,18 @@ const DataAPI = {
     } catch (e) { /* 未登录 */ }
     _currentUser = null;
     return null;
+  },
+
+  // 管理员统计
+  async getAdminStats() {
+    const resp = await apiGet("/admin/stats");
+    return resp;
+  },
+
+  // 管理员详细数据
+  async getAdminDetail() {
+    const resp = await apiGet("/admin/detail");
+    return resp;
   },
 
   // 登录

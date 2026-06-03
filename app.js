@@ -51,6 +51,7 @@ async function navigateTo(view) {
   if (view === "cocktail") await initCocktailPage();
   if (view === "profile")  await renderProfile();
   if (view === "result")   await renderResult();
+  if (view === "admin")    await renderAdmin();
 }
 
 document.addEventListener("click", (e) => {
@@ -748,13 +749,15 @@ async function renderProfile() {
  */
 function renderAuthSection() {
   if (_currentUser) {
+    const isAdmin = _currentUser.role === "admin";
     $("#authSection").innerHTML = `
       <div class="auth-logged-in">
-        <div class="auth-avatar">${_currentUser.avatar || "🍸"}</div>
+        <div class="auth-avatar" id="authAvatar">${_currentUser.avatar || "🍸"}</div>
         <div class="auth-user-info">
           <div class="auth-username">${_currentUser.nickname || _currentUser.username}</div>
           <div class="auth-uid">@${_currentUser.username}</div>
         </div>
+        ${isAdmin ? `<button class="btn btn-admin" id="btnAdminEntry">⚙️ 管理后台</button>` : ""}
         <button class="btn btn-ghost" id="btnLogout">退出登录</button>
       </div>`;
     $("#btnLogout").addEventListener("click", async () => {
@@ -762,6 +765,16 @@ function renderAuthSection() {
       await renderProfile();
       toast("已退出登录");
     });
+    // 管理后台入口按钮
+    const adminBtn = $("#btnAdminEntry");
+    if (adminBtn) {
+      adminBtn.addEventListener("click", () => navigateTo("admin"));
+    }
+    // 备用入口：点击头像5次
+    const avatarEl = $("#authAvatar");
+    if (avatarEl) {
+      avatarEl.addEventListener("click", onAvatarAdminClick);
+    }
   } else {
     $("#authSection").innerHTML = `
       <div class="auth-form-wrap">
@@ -896,6 +909,121 @@ function formatDate(iso) {
   const d = new Date(iso);
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
 }
+
+/* ============================================================
+ * 八点五、管理后台
+ * ============================================================ */
+let _adminClickCount = 0;
+let _adminClickTimer = null;
+
+async function renderAdmin() {
+  // 非管理员拦截
+  if (!_currentUser || _currentUser.role !== "admin") {
+    toast("无管理员权限");
+    navigateTo("home");
+    return;
+  }
+
+  try {
+    const [stats, detail] = await Promise.all([
+      DataAPI.getAdminStats(),
+      DataAPI.getAdminDetail(),
+    ]);
+
+    // 统计卡
+    $("#statUserCount").textContent = stats.userCount ?? "-";
+    $("#statResultCount").textContent = stats.resultCount ?? "-";
+    $("#statCocktailCount").textContent = stats.cocktailCount ?? "-";
+    $("#statTemplateCount").textContent = stats.templateCount ?? "-";
+
+    // 用户表
+    const userTbody = $("#atable-users tbody");
+    userTbody.innerHTML = (detail.users || []).map(u => `
+      <tr>
+        <td>${u.id}</td>
+        <td><b>${esc(u.username)}</b></td>
+        <td>${esc(u.nickname || "")} ${u.avatar || ""}</td>
+        <td>${u.role === "admin" ? "🔧 管理员" : "👤 用户"}</td>
+        <td>${u.testCount || 0}</td>
+        <td>${u.latestMbti || "—"}</td>
+        <td>${(u.createdAt || "").slice(0, 10)}</td>
+      </tr>`).join("");
+
+    // MBTI 分布
+    const dist = detail.mbtiDist || [];
+    const maxCnt = Math.max(1, ...dist.map(d => d.count));
+    $("#mbtiDistGrid").innerHTML = dist.map(d => `
+      <div class="mbti-dist-item">
+        <div class="mbti-dist-label">${d.mbti}</div>
+        <div class="mbti-dist-bar-track">
+          <div class="mbti-dist-bar-fill" style="width:${Math.max(3, (d.count / maxCnt * 100))}%"></div>
+        </div>
+        <div class="mbti-dist-num">${d.count}</div>
+      </div>`).join("");
+
+    // 测试记录表
+    const resTbody = $("#atable-results tbody");
+    resTbody.innerHTML = (detail.recentResults || []).map(r => `
+      <tr>
+        <td>${r.id}</td>
+        <td>${esc(r.nickname || r.username || "—")}</td>
+        <td><b>${esc(r.mbti)}</b></td>
+        <td>${esc(r.drinkName || "")}</td>
+        <td><code>${esc(r.resultNo || "")}</code></td>
+        <td>${(r.date || "").slice(0, 10)}</td>
+      </tr>`).join("");
+
+    // 特调记录表
+    const cockTbody = $("#atable-cocktails tbody");
+    cockTbody.innerHTML = (detail.recentCocktails || []).map(c => `
+      <tr>
+        <td>${c.id}</td>
+        <td>${esc(c.userNick || c.userName || "—")}</td>
+        <td>${esc(c.partnerNick || c.partnerName || "—")}</td>
+        <td>${esc(c.typeA)}</td>
+        <td>${esc(c.typeB)}</td>
+        <td><b>${esc(c.cocktailName)}</b></td>
+        <td>${c.compatibility}%</td>
+        <td>${(c.createdAt || "").slice(0, 10)}</td>
+      </tr>`).join("");
+
+  } catch (e) {
+    console.error("admin render error:", e);
+    toast("加载管理数据失败");
+  }
+}
+
+function esc(str) {
+  if (!str) return "";
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// 管理员入口：在个人中心点击头像5次进入后台
+function onAvatarAdminClick() {
+  _adminClickCount++;
+  clearTimeout(_adminClickTimer);
+  _adminClickTimer = setTimeout(() => { _adminClickCount = 0; }, 2000);
+  if (_adminClickCount >= 5) {
+    _adminClickCount = 0;
+    clearTimeout(_adminClickTimer);
+    navigateTo("admin");
+  }
+}
+
+// 管理后台 — Tab 切换
+document.addEventListener("click", (e) => {
+  const tab = e.target.closest("[data-atab]");
+  if (tab) {
+    $$(".admin-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    $$(".admin-panel").forEach(p => p.classList.remove("active"));
+    const panel = $("#apanel-" + tab.dataset.atab);
+    if (panel) panel.classList.add("active");
+  }
+  if (e.target.id === "btnAdminRefresh") {
+    renderAdmin();
+  }
+});
 
 /* ============================================================
  * 九、绑定全局按钮 & 初始化

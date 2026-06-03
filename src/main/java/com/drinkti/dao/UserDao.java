@@ -37,7 +37,7 @@ public class UserDao {
      * 根据用户名查找用户
      */
     public User findByUsername(String username) throws SQLException {
-        String sql = "SELECT id, username, password_hash, nickname, avatar FROM users WHERE username = ?";
+        String sql = "SELECT id, username, password_hash, nickname, avatar, role FROM users WHERE username = ?";
         try (Connection conn = DbUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
@@ -54,7 +54,7 @@ public class UserDao {
      * 根据 id 查找用户
      */
     public User findById(long id) throws SQLException {
-        String sql = "SELECT id, username, password_hash, nickname, avatar FROM users WHERE id = ?";
+        String sql = "SELECT id, username, password_hash, nickname, avatar, role FROM users WHERE id = ?";
         try (Connection conn = DbUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
@@ -65,6 +65,18 @@ public class UserDao {
             }
         }
         return null;
+    }
+
+    /**
+     * 统计用户总数
+     */
+    public int countAll() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM users";
+        try (Connection conn = DbUtil.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            return rs.next() ? rs.getInt(1) : 0;
+        }
     }
 
     /**
@@ -88,6 +100,7 @@ public class UserDao {
         user.setPasswordHash(rs.getString("password_hash"));
         user.setNickname(rs.getString("nickname"));
         user.setAvatar(rs.getString("avatar"));
+        user.setRole(rs.getString("role"));
         return user;
     }
 }
